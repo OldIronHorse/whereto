@@ -1,4 +1,5 @@
 from unittest import TestCase
+import urllib
 
 from whereto import DistanceMatrix
 
@@ -18,8 +19,35 @@ class TestDistanceMatrixUrl(TestCase):
       'department': 'Paris',
       'region': 'Ile-de-France',
     }]
-    self.assertEqual('https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Calais,Pas-de-Calais,Nord-de-Pas-de-Calais&destinations=Paris,Paris,Ile-de-France&key=__MY_API_KEY__',
-                     self.distance_matrix.url())
+    url = self.distance_matrix.url()
+    parsed_url = urllib.parse.urlparse(url)
+    self.assertEqual('https', parsed_url.scheme)
+    self.assertEqual('maps.googleapis.com', parsed_url.netloc)
+    self.assertEqual('/maps/api/distancematrix/json', parsed_url.path)
+    self.assertEqual({
+      'units': ['imperial'],
+      'origins': ['Calais,Pas-de-Calais,Nord-de-Pas-de-Calais'],
+      'destinations': ['Paris,Paris,Ile-de-France'],
+      'key': ['__MY_API_KEY__'],
+    }, urllib.parse.parse_qs(parsed_url.query))
+
+  def test_non_url_characters(self):
+    self.distance_matrix.destinations = [{
+      'commune': 'Nice',
+      'department': 'Alpes-Maritimes',
+      'region': "Provence-Alpes-Cote d'Azur",
+    }]
+    url = self.distance_matrix.url()
+    parsed_url = urllib.parse.urlparse(url)
+    self.assertEqual('https', parsed_url.scheme)
+    self.assertEqual('maps.googleapis.com', parsed_url.netloc)
+    self.assertEqual('/maps/api/distancematrix/json', parsed_url.path)
+    self.assertEqual({
+      'units': ['imperial'],
+      'origins': ['Calais,Pas-de-Calais,Nord-de-Pas-de-Calais'],
+      'destinations': ["Nice,Alpes-Maritimes,Provence-Alpes-Cote d'Azur"],
+      'key': ['__MY_API_KEY__'],
+    }, urllib.parse.parse_qs(parsed_url.query))
 
   def test_multiple_destinations(self):
     self.distance_matrix.destinations = [{
@@ -31,8 +59,17 @@ class TestDistanceMatrixUrl(TestCase):
       'department': 'Gironde',
       'region': 'Aquitaine',
     }]
-    self.assertEqual('https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=Calais,Pas-de-Calais,Nord-de-Pas-de-Calais&destinations=Paris,Paris,Ile-de-France|Bordeaux,Gironde,Aquitaine&key=__MY_API_KEY__',
-                     self.distance_matrix.url())
+    url = self.distance_matrix.url()
+    parsed_url = urllib.parse.urlparse(url)
+    self.assertEqual('https', parsed_url.scheme)
+    self.assertEqual('maps.googleapis.com', parsed_url.netloc)
+    self.assertEqual('/maps/api/distancematrix/json', parsed_url.path)
+    self.assertEqual({
+      'units': ['imperial'],
+      'origins': ['Calais,Pas-de-Calais,Nord-de-Pas-de-Calais'],
+      'destinations': ['Paris,Paris,Ile-de-France|Bordeaux,Gironde,Aquitaine'],
+      'key': ['__MY_API_KEY__'],
+    }, urllib.parse.parse_qs(parsed_url.query))
                 
 class TestDistanceMatrixApplyResponse(TestDistanceMatrixUrl):
   def test_single_destination(self):
@@ -57,3 +94,13 @@ class TestDistanceMatrixApplyResponse(TestDistanceMatrixUrl):
                       }],
                      self.distance_matrix.destinations)
 
+  def test_multiple_destinations(self):
+    self.distance_matrix.destinations = [{
+      'commune': 'Paris',
+      'department': 'Paris',
+      'region': 'Ile-de-France',
+    },{
+      'commune': 'Bordeaux',
+      'department': 'Gironde',
+      'region': 'Aquitaine',
+    }]

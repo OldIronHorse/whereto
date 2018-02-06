@@ -1,4 +1,5 @@
 import json 
+from urllib.parse import urlencode
 
 from whereto import town_to_string
 
@@ -11,10 +12,12 @@ class DistanceMatrix:
     destinations = '|'.join(
         [town_to_string(town) for town in self.destinations])
     return 'https://maps.googleapis.com/maps/api/distancematrix/json?' + \
-           'units=imperial&' + \
-           'origins={}&'.format(origins) + \
-           'destinations={}&'.format(destinations) + \
-           'key={}'.format(self.api_key)
+           urlencode({
+             'units': 'imperial',
+             'origins': origins,
+             'destinations': destinations,
+             'key': self.api_key,
+           })
 
   def apply_response(self, response):
     json_response = json.loads(response.decode('ascii'))
