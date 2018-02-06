@@ -1,6 +1,7 @@
 from unittest import TestCase
+from sqlite3 import Row
 
-from whereto import parse_town, town_to_string
+from whereto.town import parse, to_string, from_row
 
 class TestParseTown(TestCase):
   def test_valid_row(self):
@@ -11,12 +12,12 @@ class TestParseTown(TestCase):
         'department': 'Haute-Garonne',
         'region': 'Midi-Pyrenees',
       },
-      parse_town('4,Toulouse,Haute-Garonne,Midi-Pyrenees,"4,41,802"'))
+      parse('4,Toulouse,Haute-Garonne,Midi-Pyrenees,"4,41,802"'))
 
 class TestTownToString(TestCase):
   def test_valid_town(self):
     self.assertEqual('Toulouse,Haute-Garonne,Midi-Pyrenees',
-                     town_to_string(
+                     to_string(
                       {
                         'rank': 4,
                         'commune': 'Toulouse',
@@ -25,3 +26,16 @@ class TestTownToString(TestCase):
                       }
                      )
                     )
+
+class TestTownFromRow(TestCase):
+  def test_all_fields(self):
+    row = {
+      'commune': 'c',
+      'department': 'd',
+      'region': 'r',
+    }
+    self.assertEqual({
+                       'commune': 'c',
+                       'department': 'd',
+                       'region': 'r',
+                     },from_row(row))

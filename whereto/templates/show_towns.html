@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+  <div class="towns">
+    {% for town in towns %}
+      <div class="town">
+        <div class="commune">
+          {{ town.commune }}
+        </div>
+        <div class="department">
+          {{ town.department }}
+        </div>
+        <div class="region">
+          {{  town.region }}
+        </div>
+      </div>
+    {% else %}
+      <div class="empty-content">
+        No towns to show :-(
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

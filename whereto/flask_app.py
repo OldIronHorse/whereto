@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, g, render_template, request
 import os
 import sqlite3
 import whereto
@@ -46,6 +46,25 @@ def close_db(error):
   if hasattr(g, 'sqlite_db'):
     g.sqlite_db.close()
 
+@app.route('/towns')
+def show_towns():
+  origin = request.args.get('origin')
+  print('origin:', origin)
+  max_duration = request.args.get('maxduration')
+  print('max_duration:', max_duration)
+  db = get_db()
+  #TODO: get origin as dict
+  origin_town = whereto.town.from_row(db.execute(
+      'select commune, department, region from towns where commune = ?', 
+      (origin,)).fetchone())
+  cur = db.execute('select commune, department, region from towns order by commune')
+  destinations = [whereto.town.from_row(town) for town in  cur.fetchall()]
+  print('destinations:', destinations)
+  #TODO: get desinations as list of dicts
+  #TODO: hit maps api for travel times
+  #TODO: filters and sort
+  return render_template('show_towns.html', towns=destinations)
+
 @app.route('/')
-def hello_world():
-  return 'Hello, World!'
+def main_form():
+  return render_template('main_form.html')

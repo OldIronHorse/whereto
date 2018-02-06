@@ -1,16 +1,16 @@
 import json 
 from urllib.parse import urlencode
 
-from whereto import town_to_string
+import whereto.town
 
 class DistanceMatrix:
   def __init__(self, api_key):
     self.api_key = api_key
 
   def url(self):
-    origins = town_to_string(self.origin)
+    origins = whereto.town.to_string(self.origin)
     destinations = '|'.join(
-        [town_to_string(town) for town in self.destinations])
+        [whereto.town.to_string(town) for town in self.destinations])
     return 'https://maps.googleapis.com/maps/api/distancematrix/json?' + \
            urlencode({
              'units': 'imperial',
