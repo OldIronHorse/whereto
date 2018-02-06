@@ -6,6 +6,7 @@ setup(name='whereto',
       url='http://github.com/oldironhorse/whereto',
       license='GPL 3.0',
       packages=['whereto'],
+      install_requires=['flask']
       test_suite='nose.collector',
       tests_require=['nose'],
       zip_safe=False)
