@@ -1,0 +1,4 @@
+graft whereto/templates
+graft whereto/static
+graft whereto/data
+include whereto/schema.sql
