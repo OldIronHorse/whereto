@@ -1,6 +1,7 @@
 from flask import Flask, g
 import os
 import sqlite3
+import whereto
 
 app = Flask('whereto')
 app.config.from_object(__name__)
@@ -22,14 +23,23 @@ def get_db():
 
 def init_db():
   db = get_db()
+  c = db.cursor()
   with app.open_resource('schema.sql', mode='r') as f:
-    db.cursor().executescript(f.read())
+    c.executescript(f.read())
+  with app.open_resource('data/towns-france.csv', mode='r') as t:
+    towns = whereto.load_towns(t)
+    for town in towns:
+      c.execute("insert into towns(commune, department, region) values(?,?,?)",
+        (town['commune'], town['department'], town['region']))
   db.commit()
 
 @app.cli.command('initdb')
 def initdb_command():
   init_db()
   print('Initialised the database')
+  db = get_db()
+  for town in db.cursor().execute('select * from towns'):
+    print(tuple(town))
 
 @app.teardown_appcontext
 def close_db(error):
