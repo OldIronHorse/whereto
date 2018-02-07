@@ -92,7 +92,8 @@ def show_towns():
   db = get_db()
   populate_routes(db, origin_id)
   routes = get_routes(db, origin_id, max_duration)
-  return render_template('show_towns.html', 
+  return render_template('show_towns.html',
+    api_key=app.config['MAPS_API_KEY'],
     towns=sorted(routes, key=lambda t: t['duration']))
 
 @app.route('/')
