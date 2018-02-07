@@ -20,5 +20,5 @@ class DistanceMatrix:
            })
 
   def apply_response(self, response):
-    json_response = json.loads(response.decode('ascii'))
-    self.destinations = [{**dest, 'distance': resp['distance'], 'duration': resp['duration']} for dest, resp in zip(self.destinations, json_response['rows'][0]['elements'])]
+    json_response = json.loads(response.decode('utf-8'))
+    self.destinations = [{**dest, 'distance': resp['distance'], 'duration': resp['duration']} for dest, resp in zip(self.destinations, json_response['rows'][0]['elements']) if resp['status'] == 'OK']

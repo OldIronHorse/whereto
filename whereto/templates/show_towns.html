@@ -3,6 +3,9 @@
   <div class="towns">
     {% for town in towns %}
       <div class="town">
+        <div class="duration">
+          {{ town.duration_text }}
+        </div>
         <div class="commune">
           {{ town.commune }}
         </div>
